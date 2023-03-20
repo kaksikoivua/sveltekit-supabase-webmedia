@@ -1,0 +1,9 @@
+services:
+  app:
+    container_name: sveltekit-supabase-webmedia
+    build: .
+    volumes:
+      - .:/home/kks/sveltekit-supabase-webmedia
+    ports:
+      - "5173:5173"
+    tty: true
