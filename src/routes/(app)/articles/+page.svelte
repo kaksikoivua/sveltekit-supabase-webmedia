@@ -6,6 +6,8 @@
   const articles = data.articles;
 </script>
 
+<div><a href="/">Index</a></div>
+
 <h1>Articles</h1>
 
 <ul>
