@@ -1,18 +1,28 @@
 <script lang="ts">
+  import { marked } from 'marked';
+
   import type { PageData } from './$types';
 
   export let data: PageData;
 
   const article = data.article;
+
+  const renderer = {
+    heading(text, level) {
+      level += 1;
+      return `<h${level}>${text}</h${level}>`;
+    }
+  };
+  marked.use({ renderer });
 </script>
 
 <div><a href="/articles">Article list</a></div>
 
 <article>
   <h1>{article.title}</h1>
-  <p>{article.content1}</p>
+  {@html marked(article.content1)}
   {#if article.content2}
-    <p>{article.content2}</p>
+    {@html marked(article.content2)}
   {/if}
 </article>
 
