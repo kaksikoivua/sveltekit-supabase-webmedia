@@ -2,11 +2,16 @@
   export let heading, items;
 </script>
 
-<h1>{heading}</h1>
+<h1><a href="/articles">{heading}</a></h1>
 
 <ul>
   {#each items as article (article.id)}
-    <li><a href={`/articles/${article.slug}`}>{article.title}</a></li>
+    <li>
+      <a href={`/articles/${article.slug}`}>{article.title}</a>
+      {#each article.tags as tag, i (i)}
+        <a href={`/articles?tag=${tag.name}`} class="tag">{tag.name}</a>
+      {/each}
+    </li>
   {/each}
 </ul>
 

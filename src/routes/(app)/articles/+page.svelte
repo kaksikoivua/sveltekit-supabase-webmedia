@@ -5,7 +5,7 @@
 
   export let data: PageData;
 
-  const articles = data.articles;
+  $: articles = data.articles;
 </script>
 
 <div><a href="/">Index</a></div>
