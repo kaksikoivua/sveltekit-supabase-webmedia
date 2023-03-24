@@ -1,15 +1,19 @@
 <script lang="ts">
-  export let heading, items;
+  export let items, mediaType;
 </script>
 
-<h1><a href="/articles">{heading}</a></h1>
+<h1>
+  <a href={`/${mediaType}`}>
+    {mediaType.charAt(0).toUpperCase() + mediaType.substring(1)}
+  </a>
+</h1>
 
 <ul>
-  {#each items as article (article.id)}
+  {#each items as item (item.id)}
     <li>
-      <a href={`/articles/${article.slug}`}>{article.title}</a>
-      {#each article.tags as tag, i (i)}
-        <a href={`/articles?tag=${tag.name}`} class="tag">{tag.name}</a>
+      <a href={`/${mediaType}/${item.slug}`}>{item.title}</a>
+      {#each item.tags as tag, i (i)}
+        <a href={`/${mediaType}?tag=${tag.name}`} class="tag">{tag.name}</a>
       {/each}
     </li>
   {/each}

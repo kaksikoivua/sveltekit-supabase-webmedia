@@ -10,4 +10,4 @@
 
 <div><a href="/">Index</a></div>
 
-<List heading="Articles" items={articles}/>
+<List items={articles} mediaType="articles"/>
