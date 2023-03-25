@@ -1,13 +1,17 @@
 <script lang="ts">
   import Article from '$lib/Article.svelte';
+  import { article } from '$lib/stores';
 
   import type { PageData } from './$types';
 
   export let data: PageData;
 
-  const article = data.article;
+  if ($article) {
+    Object.assign(data.article, $article);
+    $article = false;
+  }
 </script>
 
-<div><a href="/articles">Article list</a></div>
+<div><a href="/articles">Articles</a></div>
 
-<Article {article}/>
+<Article article={data.article}/>

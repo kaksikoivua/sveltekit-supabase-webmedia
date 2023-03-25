@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let items, mediaType;
+  export let items, mediaType, setToStore;
 </script>
 
 <h1>
@@ -11,7 +11,9 @@
 <ul>
   {#each items as item (item.id)}
     <li>
-      <a href={`/${mediaType}/${item.slug}`}>{item.title}</a>
+      <a href={`/${mediaType}/${item.slug}`} on:click={() => setToStore(item)}>
+        {item.title}
+      </a>
       {#each item.tags as tag, i (i)}
         <a href={`/${mediaType}?tag=${tag.name}`} class="tag">{tag.name}</a>
       {/each}
