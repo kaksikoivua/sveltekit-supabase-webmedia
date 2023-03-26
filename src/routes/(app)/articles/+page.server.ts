@@ -20,8 +20,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     return {
       articles: data
     };
-  } else {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
   }
+
+  console.log(error);
+  throw svelteKitError(500, 'Internal Error');
 };

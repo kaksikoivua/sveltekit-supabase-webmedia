@@ -28,8 +28,8 @@ export const load: PageServerLoad = async ({ locals, params, request }) => {
     } else {
       throw svelteKitError(404, 'Not found');
     }
-  } else {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
   }
+
+  console.log(error);
+  throw svelteKitError(500, 'Internal Error');
 };
