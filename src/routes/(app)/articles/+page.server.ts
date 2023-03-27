@@ -5,20 +5,30 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, url }) => {
   const tag = url.searchParams.get('tag');
 
-  let columnsString = 'id, title, slug';
+  let columnsString = 'id, title, slug, username';
 
   const { data, error } = tag !== null
     ? await locals.supabase
-      .from('articles')
+      .from('articles_profiles_view')
       .select(columnsString + ', tags!inner(name)')
       .eq('tags.name', tag)
     : await locals.supabase
-      .from('articles')
+      .from('articles_profiles_view')
       .select(columnsString + ', tags(name)');
 
   if (data) {
     return {
-      articles: data
+      articles: data,
+      username: await locals.isAuthor()
+        ? await locals.supabase
+          .from('profiles')
+          .select('username')
+          .then(({ data }) => {
+            if (data) {
+              return data[0].username;
+            }
+          })
+        : null
     };
   }
 

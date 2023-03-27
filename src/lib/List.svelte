@@ -1,5 +1,7 @@
 <script lang="ts">
-  export let items, mediaType, setToStore;
+  import { goto } from '$app/navigation';
+
+  export let items, mediaType, setToStore, username;
 </script>
 
 <h1>
@@ -17,6 +19,11 @@
       {#each item.tags as tag, i (i)}
         <a href={`/${mediaType}?tag=${tag.name}`} class="tag">{tag.name}</a>
       {/each}
+      {#if item.username === username}
+        <button on:click={() => goto(`/admin/${mediaType}/${item.id}`)}>
+          Edit
+        </button>
+      {/if}
     </li>
   {/each}
 </ul>

@@ -8,12 +8,18 @@
   $: supabase = data.supabase;
 
   let email = '';
+  let username = '';
   let isNewRegistration = false;
 
   const signUp = async () => {
     let { data, error } = await supabase.auth.signUp({
       email: email,
       password: 'PMccwYzAIxHHzzeCKBJE',
+      options: {
+        data: {
+          username: username
+        }
+      }
     });
     goto('/');
   };
@@ -21,18 +27,21 @@
   const signIn = async () => {
     let { data, error } = await supabase.auth.signInWithPassword({
       email: email,
-      password: 'PMccwYzAIxHHzzeCKBJE',
+      password: 'PMccwYzAIxHHzzeCKBJE'
     });
     goto('/');
   };
 </script>
 
-<label for="">
+<label>
   Email:
   <input type="email" bind:value={email} placeholder="email@email.com">
 </label>
-<br>
 {#if isNewRegistration}
+  <label>
+    Username:
+    <input type="text" bind:value={username} placeholder="username">
+  </label>
   <button on:click={signUp}>SignUp</button>
   <p on:click={() => (isNewRegistration = false)}>Already have an account?</p>
 {:else}

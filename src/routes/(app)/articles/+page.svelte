@@ -10,9 +10,14 @@
 
   const setToStore = (article) => {
     $article = article;
-  }
+  };
 </script>
 
 <div><a href="/">Index</a></div>
 
-<List items={articles} mediaType="articles" {setToStore}/>
+<List
+  items={articles}
+  mediaType="articles"
+  {setToStore}
+  username={data.username}
+/>
