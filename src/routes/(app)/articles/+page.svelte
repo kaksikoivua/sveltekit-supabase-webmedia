@@ -19,5 +19,5 @@
   items={articles}
   mediaType="articles"
   {setToStore}
-  username={data.username}
+  signedInCreator={data.signedInCreator}
 />

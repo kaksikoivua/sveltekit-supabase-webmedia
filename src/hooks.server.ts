@@ -23,7 +23,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     return session;
   };
 
-  event.locals.isAuthor = async () => {
+  event.locals.isCreator = async () => {
     const role = await event.locals.supabase
       .from('profiles')
       .select('role:roles(name)')
@@ -34,7 +34,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       });
 
     if (role && ('name' in role)) {
-      if (role.name === 'author') {
+      if (role.name === 'creator') {
         return true;
       }
     }
@@ -43,7 +43,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   };
 
   if (event.url.pathname.startsWith('/admin')) {
-    if (!await event.locals.isAuthor()) {
+    if (!await event.locals.isCreator()) {
       throw redirect(303, '/');
     }
   }

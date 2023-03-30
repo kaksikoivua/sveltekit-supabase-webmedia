@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Article from '$lib/Article.svelte';
+  import ArticleEditor from '$lib/ArticleEditor.svelte';
   import { article } from '$lib/stores';
 
   import type { PageData } from './$types';
@@ -12,6 +12,6 @@
   }
 </script>
 
-<div><a href="/articles">Articles</a></div>
+<div><a href="/admin">Admin</a></div>
 
-<Article article={data.article}/>
+<ArticleEditor article={data.article}/>
