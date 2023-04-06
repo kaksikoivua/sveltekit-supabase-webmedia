@@ -5,7 +5,7 @@ declare global {
     interface Locals {
       supabase: SupabaseClient;
       getSession(): Promise<Session | null>;
-      isCreator(): Promise<boolean>;
+      getSignedInUserProfile(): Promise<T | undefined>;
     }
     interface PageData {
       session: Session | null;

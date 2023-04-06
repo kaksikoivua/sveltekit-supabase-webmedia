@@ -34,10 +34,10 @@
         </a>
         {#each item.tags as tag, i (i)}
           {#if tag}
-            <a href={`/${mediaType}?tag=${tag}`} class="tag">{tag}</a>
+            <a href={`/${mediaType}?tag=${tag.name}`} class="tag">{tag.name}</a>
           {/if}
         {/each}
-        {#if item.username === signedInCreator?.username}
+        {#if item.profile.username === signedInCreator?.username}
           <button
             on:click={() => {
               setToStore(item);

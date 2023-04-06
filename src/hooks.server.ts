@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { error as svelteKitError, redirect } from '@sveltejs/kit';
 
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
 
@@ -23,27 +23,27 @@ export const handle: Handle = async ({ event, resolve }) => {
     return session;
   };
 
-  event.locals.isCreator = async () => {
-    const role = await event.locals.supabase
-      .from('profiles')
-      .select('role:roles(name)')
-      .then(({ data }) => {
-        if (data && data.length) {
-          return data[0].role;
-        }
-      });
-
-    if (role && ('name' in role)) {
-      if (role.name === 'creator') {
-        return true;
-      }
+  event.locals.getSignedInUserProfile = async () => {
+    const session = await event.locals.getSession();
+    if (!session) {
+      return undefined;
     }
-
-    return false;
+    return event.locals.supabase
+      .from('profiles')
+      .select('id, username, first_name, last_name, role:roles(name)')
+      .eq('id', session.user.id)
+      .then(({ data, error }) => {
+        if (error) {
+          console.log(error);
+          throw svelteKitError(500, 'Internal Error');
+        }
+        return data[0];
+      });
   };
 
   if (event.url.pathname.startsWith('/admin')) {
-    if (!await event.locals.isCreator()) {
+    const profile = await event.locals.getSignedInUserProfile();
+    if (!profile || profile.role.name !== 'creator') {
       throw redirect(303, '/');
     }
   }
