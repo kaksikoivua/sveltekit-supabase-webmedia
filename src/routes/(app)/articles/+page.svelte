@@ -16,8 +16,8 @@
 <div><a href="/">Index</a></div>
 
 <List
+  appName="articles"
   items={articles}
-  mediaType="articles"
   {setToStore}
   signedInCreator={data.signedInCreator}
 />

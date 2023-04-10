@@ -1,7 +1,7 @@
 import { goto, invalidateAll } from '$app/navigation';
 
-export const patch = async (data: object, id: number, mediaType: string) => {
-  await fetch(`/api/${mediaType}/${id}`, {
+export const patch = async (data: object, id: number, appName: string) => {
+  await fetch(`/api/${appName}/${id}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export const patch = async (data: object, id: number, mediaType: string) => {
     .then(json => {
       console.log(json);
       if ('slug' in data) {
-        goto(`/admin/${mediaType}/${data.slug}`);
+        goto(`/admin/${appName}/${data.slug}`);
         return;
       }
       invalidateAll();

@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  export let items, mediaType, setToStore, signedInCreator;
+  export let appName, items, setToStore, signedInCreator;
 
   let isMyPostsOnly = false;
 </script>
 
 <h1>
-  <a href={`/${mediaType}`}>
-    {mediaType.charAt(0).toUpperCase() + mediaType.substring(1)}
+  <a href={`/${appName}`}>
+    {appName.charAt(0).toUpperCase() + appName.substring(1)}
   </a>
 </h1>
 
@@ -24,24 +24,24 @@
 
 <ul>
   {#each items as item (item.id)}
-    {#if !isMyPostsOnly || item.username === signedInCreator.username}
+    {#if !isMyPostsOnly || item.profile.username === signedInCreator.username}
       <li>
         <a
-          href={`/${mediaType}/${item.slug}`}
+          href={`/${appName}/${item.slug}`}
           on:click={() => setToStore(item)}
         >
           {item.title}
         </a>
         {#each item.tags as tag, i (i)}
           {#if tag}
-            <a href={`/${mediaType}?tag=${tag.name}`} class="tag">{tag.name}</a>
+            <a href={`/${appName}?tag=${tag.name}`} class="tag">{tag.name}</a>
           {/if}
         {/each}
         {#if item.profile.username === signedInCreator?.username}
           <button
             on:click={() => {
               setToStore(item);
-              goto(`/admin/${mediaType}/${item.slug}`);
+              goto(`/admin/${appName}/${item.slug}`);
             }}
           >
             Edit
