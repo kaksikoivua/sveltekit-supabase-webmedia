@@ -3,7 +3,7 @@
 
   export let appName, items, setToStore, signedInCreator;
 
-  let isMyPostsOnly = false;
+  let shouldShowOwnPostsOnly = false;
 </script>
 
 <h1>
@@ -13,8 +13,8 @@
 </h1>
 
 {#if signedInCreator}
-  <button on:click={() => (isMyPostsOnly = !isMyPostsOnly)}>
-    {#if isMyPostsOnly}
+  <button on:click={() => (shouldShowOwnPostsOnly = !shouldShowOwnPostsOnly)}>
+    {#if shouldShowOwnPostsOnly}
       All
     {:else}
       My Posts Only
@@ -24,7 +24,8 @@
 
 <ul>
   {#each items as item (item.id)}
-    {#if !isMyPostsOnly || item.profile.username === signedInCreator.username}
+    {#if !shouldShowOwnPostsOnly
+         || item.profile.username === signedInCreator.username}
       <li>
         <a
           href={`/${appName}/${item.slug}`}
