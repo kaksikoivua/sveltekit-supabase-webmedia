@@ -1,6 +1,13 @@
 import { error as svelteKitError } from '@sveltejs/kit';
 
-import { deleteUnusedTag } from '$lib/server/tags';
+import { deleteTag } from '$lib/server/tags';
+
+interface Article {
+  title: string;
+  slug: string;
+  content1: string;
+  content2: string;
+}
 
 interface Event {
   locals: App.Locals;
@@ -9,14 +16,7 @@ interface Event {
   };
 }
 
-interface PatchData {
-  title: string;
-  slug: string;
-  content1: string;
-  content2: string;
-}
-
-export const updateArticle = async (patchData: PatchData, event: Event) => {
+export const updateArticle = async (patchData: Article, event: Event) => {
   const { error } = await event.locals.supabase
     .from('articles')
     .update({
@@ -64,5 +64,5 @@ export const removeTagFromArticle = async (tagId: number, event: Event) => {
     throw svelteKitError(500, 'Internal Error');
   }
 
-  deleteUnusedTag(tagId, { locals: event.locals });
+  deleteTag(tagId, { locals: event.locals });
 };

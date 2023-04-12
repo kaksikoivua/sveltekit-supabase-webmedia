@@ -4,35 +4,21 @@ interface Event {
   locals: App.Locals;
 }
 
-export const getNewTagId = async (tagName: string, event: Event) => {
+export const addTag = async (tagName: string, event: Event) => {
   const { data, error } = await event.locals.supabase
     .from('tags')
-    .select('id')
-    .eq('name', tagName);
+    .insert({ name: tagName })
+    .select('id');
 
   if (error) {
     console.log(error);
     throw svelteKitError(500, 'Internal Error');
   }
 
-  const newTagId = data.length
-    ? data[0].id
-    : await event.locals.supabase
-      .from('tags')
-      .insert({ name: tagName })
-      .select('id')
-      .then(({ data, error }) => {
-        if (error) {
-          console.log(error);
-          throw svelteKitError(500, 'Internal Error');
-        }
-        return data[0].id;
-      });
-
-  return newTagId;
+  return data[0].id;
 };
 
-export const checkIfTagIsUsed = async (tagId: number, event: Event) => {
+export const deleteTag = async (tagId: number, event: Event) => {
   const apps = ['articles'];
 
   for (const app of apps) {
@@ -47,23 +33,35 @@ export const checkIfTagIsUsed = async (tagId: number, event: Event) => {
     }
 
     if (count) {
-      return true;
+      return;
     }
   }
 
-  return false;
+  const { error } = await event.locals.supabase
+    .from('tags')
+    .delete()
+    .eq('id', tagId);
+
+  if (error) {
+    console.log(error);
+    throw svelteKitError(500, 'Internal Error');
+  }
 };
 
-export const deleteUnusedTag = async (tagId: number, event: Event) => {
-  if (!(await checkIfTagIsUsed(tagId, event))) {
-    const { error } = await event.locals.supabase
-      .from('tags')
-      .delete()
-      .eq('id', tagId);
+export const getNewTagId = async (tagName: string, event: Event) => {
+  const { data, error } = await event.locals.supabase
+    .from('tags')
+    .select('id')
+    .eq('name', tagName);
 
-    if (error) {
-      console.log(error);
-      throw svelteKitError(500, 'Internal Error');
-    }
+  if (error) {
+    console.log(error);
+    throw svelteKitError(500, 'Internal Error');
   }
+
+  const newTagId = data.length
+    ? data[0].id
+    : await addTag(tagName, event);
+
+  return newTagId;
 };

@@ -3,7 +3,7 @@ import {
   removeTagFromArticle,
   updateArticle
 } from '$lib/server/articles';
-import { deleteUnusedTag, getNewTagId } from '$lib/server/tags';
+import { deleteTag, getNewTagId } from '$lib/server/tags';
 
 import type { RequestHandler } from './$types';
 
@@ -17,7 +17,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
       addTagToArticle(newTagId, patchData.tag.id, { locals, params });
 
       if (patchData.tag.id) {
-        deleteUnusedTag(patchData.tag.id, { locals });
+        deleteTag(patchData.tag.id, { locals });
       }
     } else {
       removeTagFromArticle(patchData.tag.id, { locals, params });
