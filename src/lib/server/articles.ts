@@ -9,23 +9,62 @@ interface Article {
   content2: string;
 }
 
-interface Event {
-  locals: App.Locals;
-  params: {
-    id: string;
-  };
-}
+export const addArticle = async (postData: Article, locals: App.Locals) => {
+  const session = await locals.getSession();
+  const userId = session?.user.id;
 
-export const updateArticle = async (patchData: Article, event: Event) => {
-  const { error } = await event.locals.supabase
+  const { data, error } = await locals.supabase
     .from('articles')
-    .update({
-      title: patchData.title,
-      slug: patchData.slug,
-      content1: patchData.content1,
-      content2: patchData.content2
-    })
-    .eq('id', event.params.id);
+    .insert(Object.assign(postData, { user_id: userId }))
+    .select('id');
+
+  if (error) {
+    console.log(error);
+    throw svelteKitError(500, 'Internal Error');
+  }
+
+  return data[0].id;
+};
+
+export const getArticle = async (
+  id: number,
+  columnsString: string,
+  locals: App.Locals
+)  => {
+  const { data, error } = await locals.supabase
+    .from('articles')
+    .select(columnsString)
+    .eq('id', id);
+
+  if (error) {
+    console.log(error);
+    throw svelteKitError(500, 'Internal Error');
+  }
+
+  return data[0];
+};
+
+export const updateArticle = async (
+  patchData: Article,
+  id: number,
+  locals: App.Locals
+) => {
+  const { error } = await locals.supabase
+    .from('articles')
+    .update(patchData)
+    .eq('id', id);
+
+  if (error) {
+    console.log(error);
+    throw svelteKitError(500, 'Internal Error');
+  }
+};
+
+export const deleteArticle = async (id: number, locals: App.Locals) => {
+  const { error } = await locals.supabase
+    .from('articles')
+    .delete()
+    .eq('id', id);
 
   if (error) {
     console.log(error);
@@ -35,17 +74,18 @@ export const updateArticle = async (patchData: Article, event: Event) => {
 
 export const addTagToArticle = async (
   newTagId: number,
-  currentTagId: number,
-  event: Event
+  currentTagId: number | undefined,
+  articleId: number,
+  locals: App.Locals
 ) => {
-  let query = event.locals.supabase.from('articles_tags');
+  let query = locals.supabase.from('articles_tags');
 
   const { error } = currentTagId
     ? await query
-      .update({ article_id: event.params.id, tag_id: newTagId })
-      .match({ article_id: event.params.id, tag_id: currentTagId })
+      .update({ article_id: articleId, tag_id: newTagId })
+      .match({ article_id: articleId, tag_id: currentTagId })
     : await query
-      .insert({ article_id: event.params.id, tag_id: newTagId });
+      .insert({ article_id: articleId, tag_id: newTagId });
 
   if (error) {
     console.log(error);
@@ -53,16 +93,18 @@ export const addTagToArticle = async (
   }
 };
 
-export const removeTagFromArticle = async (tagId: number, event: Event) => {
-  const { error } = await event.locals.supabase
+export const removeTagFromArticle = async (
+  tagId: number,
+  articleId: number,
+  locals: App.Locals
+) => {
+  const { error } = await locals.supabase
     .from('articles_tags')
     .delete()
-    .match({ article_id: event.params.id, tag_id: tagId });
+    .match({ article_id: articleId, tag_id: tagId });
 
   if (error) {
     console.log(error);
     throw svelteKitError(500, 'Internal Error');
   }
-
-  deleteTag(tagId, { locals: event.locals });
 };

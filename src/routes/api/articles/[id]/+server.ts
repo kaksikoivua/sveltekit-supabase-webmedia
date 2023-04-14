@@ -1,5 +1,7 @@
 import {
   addTagToArticle,
+  deleteArticle,
+  getArticle,
   removeTagFromArticle,
   updateArticle
 } from '$lib/server/articles';
@@ -10,23 +12,44 @@ import type { RequestHandler } from './$types';
 export const PATCH: RequestHandler = async ({ locals, params, request }) => {
   const patchData = await request.json();
 
+  const articleId = Number(params.id);
+
   if ('tag' in patchData) {
-    if (patchData.tag.name !== '') {
-      const newTagId = await getNewTagId(patchData.tag.name, { locals });
+    const currentTagId = patchData.tag.id;
+    const tagName = patchData.tag.name;
 
-      addTagToArticle(newTagId, patchData.tag.id, { locals, params });
-
-      if (patchData.tag.id) {
-        deleteTag(patchData.tag.id, { locals });
-      }
+    if (tagName !== '') {
+      const newTagId = await getNewTagId(tagName, locals);
+      await addTagToArticle(newTagId, currentTagId, articleId, locals);
     } else {
-      removeTagFromArticle(patchData.tag.id, { locals, params });
+      await removeTagFromArticle(currentTagId, articleId, locals);
+    }
+
+    if (currentTagId) {
+      await deleteTag(currentTagId, locals);
     }
   } else {
-    updateArticle(patchData, { locals, params });
+    await updateArticle(patchData, articleId, locals);
   }
 
-  const body = JSON.stringify({ message: 'Success' });
-  const options = { status: 200 };
-  return new Response(body, options);
+  const options = { status: 204 };
+  return new Response(null, options);
+};
+
+export const DELETE: RequestHandler = async ({ locals, params }) => {
+  const articleId = Number(params.id);
+
+  const article = await getArticle(articleId, 'tags(id)', locals);
+
+  deleteArticle(articleId, locals);
+
+  if ('tags' in article && Array.isArray(article.tags)) {
+    const tags = article.tags;
+    for (const tag of tags) {
+      deleteTag(tag.id, locals);
+    }
+  }
+
+  const options = { status: 204 };
+  return new Response(null, options);
 };

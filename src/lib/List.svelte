@@ -1,6 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
+  import { send } from '$lib/client/fetch';
+
   export let appName, items, setToStore, signedInCreator;
 
   let shouldShowOwnPostsOnly = false;
@@ -46,6 +48,13 @@
             }}
           >
             Edit
+          </button>
+          <button
+            on:click={() => {
+              send('DELETE', { id: item.id }, 'articles');
+            }}
+          >
+            Delete
           </button>
         {/if}
       </li>

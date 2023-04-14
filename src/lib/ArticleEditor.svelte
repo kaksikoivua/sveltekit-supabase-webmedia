@@ -1,12 +1,20 @@
 <script lang="ts">
-  import { patch } from '$lib/client/fetch';
+  import { send } from '$lib/client/fetch';
 
   export let article;
 
-  const contents = [article.content1, article.content2];
+  if (!article) {
+    article = { tags: [] };
+  }
+
+  const createArticle = () => {
+    send('POST', article, 'articles');
+  };
 
   const updateArticle = (data) => {
-    patch(data, article.id, 'articles');
+    if (article.id) {
+      send('PATCH', Object.assign(data, { id: article.id }), 'articles');
+    }
   };
 
   const updateTag = (data) => {
@@ -34,12 +42,12 @@
     }}
   >
 </div>
-{#each contents as content, i (i)}
+{#each Array(2) as _, i (i)}
   <div>
     <div>Content{i + 1}:</div>
     <textarea
       cols="30" rows="10"
-      bind:value={content}
+      bind:value={article[`content${i + 1}`]}
       on:change={(e) => {
         updateArticle({ [`content${i + 1}`]: e.currentTarget.value });
       }}
@@ -54,7 +62,7 @@
         type="text"
         value={article.tags[i].name}
         on:change={(e) => {
-          updateTag({ name: e.currentTarget.value, id: article.tags[i].id })
+          updateTag({ name: e.currentTarget.value, id: article.tags[i].id });
         }}
       >
     {:else}
@@ -62,12 +70,22 @@
         type="text"
         value=""
         on:change={(e) => {
-          updateTag({ name: e.currentTarget.value, id: undefined })
+          if (article.id) {
+            updateTag({ name: e.currentTarget.value, id: undefined });
+          } else {
+            article.tags[i] = { name: e.currentTarget.value };
+          }
         }}
       >
     {/if}
   </div>
 {/each}
+
+{#if !article.id}
+  <button on:click={() => {createArticle()}}>
+    Create
+  </button>
+{/if}
 
 <p>client-side data fetching with RLS</p>
 <pre>{JSON.stringify(article, null, 2)}</pre>
