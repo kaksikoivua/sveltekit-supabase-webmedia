@@ -4,7 +4,13 @@
   export let article;
 
   if (!article) {
-    article = { tags: [] };
+    article = {
+      title: '',
+      slug: '',
+      content1: '',
+      content2: '',
+      tags: []
+    };
   }
 
   const createArticle = () => {

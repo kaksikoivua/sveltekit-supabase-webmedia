@@ -1,5 +1,3 @@
-import { error as svelteKitError } from '@sveltejs/kit';
-
 export const addTag = async (tagName: string, locals: App.Locals) => {
   const { data, error } = await locals.supabase
     .from('tags')
@@ -7,8 +5,7 @@ export const addTag = async (tagName: string, locals: App.Locals) => {
     .select('id');
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 
   return data[0].id;
@@ -24,8 +21,7 @@ export const deleteTag = async (tagId: number, locals: App.Locals) => {
       .eq('tag_id', tagId);
 
     if (error) {
-      console.log(error);
-      throw svelteKitError(500, 'Internal Error');
+      throw new Error(error.message);
     }
 
     if (count) {
@@ -39,8 +35,7 @@ export const deleteTag = async (tagId: number, locals: App.Locals) => {
     .eq('id', tagId);
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 };
 
@@ -51,8 +46,7 @@ export const getNewTagId = async (tagName: string, locals: App.Locals) => {
     .eq('name', tagName);
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 
   const newTagId = data.length

@@ -1,6 +1,4 @@
-import { error as svelteKitError } from '@sveltejs/kit';
-
-import { deleteTag } from '$lib/server/tags';
+import { Validator } from '$lib/server/validation';
 
 interface Article {
   title: string;
@@ -9,7 +7,45 @@ interface Article {
   content2: string;
 }
 
+class CreateValidator extends Validator<Article> {
+  isProvidedType = (data: any): data is Article => {
+    return typeof data.title === 'string'
+      && typeof data.slug === 'string'
+      && typeof data.content1 === 'string'
+      && typeof data.content2 === 'string';
+  };
+
+  setUpValidator = () => {
+    this.add({
+      rule: 'mustNotBeEmpty',
+      fieldNames: ['title', 'slug', 'content1'],
+      message: 'This field is required.'
+    });
+
+    this.add({
+      rule: 'mustBeInRange',
+      fieldNames: ['title'],
+      message: 'Title must be between 3 and 20 characters long.',
+      additionalArgs: { min: 3, max: 20 }
+    });
+
+    return this;
+  };
+}
+
+class UpdateValidator extends CreateValidator {
+  isProvidedType = (data: any): data is Article => {
+    return typeof data.title === 'string'
+      || typeof data.slug === 'string'
+      || typeof data.content1 === 'string'
+      || typeof data.content2 === 'string';
+  };
+}
+
 export const addArticle = async (postData: Article, locals: App.Locals) => {
+  const articleValidator = new CreateValidator();
+  articleValidator.setUpValidator().validate(postData);
+
   const session = await locals.getSession();
   const userId = session?.user.id;
 
@@ -19,8 +55,7 @@ export const addArticle = async (postData: Article, locals: App.Locals) => {
     .select('id');
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 
   return data[0].id;
@@ -37,8 +72,7 @@ export const getArticle = async (
     .eq('id', id);
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 
   return data[0];
@@ -49,14 +83,16 @@ export const updateArticle = async (
   id: number,
   locals: App.Locals
 ) => {
+  const articleValidator = new UpdateValidator();
+  articleValidator.setUpValidator().validate(patchData);
+
   const { error } = await locals.supabase
     .from('articles')
     .update(patchData)
     .eq('id', id);
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 };
 
@@ -67,8 +103,7 @@ export const deleteArticle = async (id: number, locals: App.Locals) => {
     .eq('id', id);
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 };
 
@@ -88,8 +123,7 @@ export const addTagToArticle = async (
       .insert({ article_id: articleId, tag_id: newTagId });
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 };
 
@@ -104,7 +138,6 @@ export const removeTagFromArticle = async (
     .match({ article_id: articleId, tag_id: tagId });
 
   if (error) {
-    console.log(error);
-    throw svelteKitError(500, 'Internal Error');
+    throw new Error(error.message);
   }
 };
