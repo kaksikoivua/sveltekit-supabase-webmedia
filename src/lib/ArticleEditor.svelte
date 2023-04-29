@@ -63,7 +63,7 @@
 {#each Array(3) as _, i (i)}
   <div>
     <div>Tag{i + 1}:</div>
-    {#if article.tags[i]}
+    {#if article.id && article.tags[i]}
       <input
         type="text"
         value={article.tags[i].name}
