@@ -51,7 +51,7 @@
           </button>
           <button
             on:click={() => {
-              send('DELETE', { id: item.id }, 'articles');
+              send('DELETE', { id: item.id }, appName);
             }}
           >
             Delete
